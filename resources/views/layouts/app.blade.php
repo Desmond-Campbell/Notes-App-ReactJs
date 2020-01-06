@@ -26,7 +26,7 @@
     <div id="app">
 
         <div id="loader" style="display: none">
-            Wait...
+            ...
         </div>
 
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" id="top-nav">

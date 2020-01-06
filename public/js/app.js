@@ -87490,7 +87490,8 @@ function (_React$Component) {
         name: 'All Notes'
       },
       currentSidebarView: 'notes',
-      new_folder: ''
+      new_folder: '',
+      createFolderMode: 'create'
     };
     _this.search = _this.search.bind(_assertThisInitialized(_this));
     timer1 = setInterval(function () {
@@ -88682,23 +88683,7 @@ function (_React$Component2) {
         className: "fa fa-sliders-h"
       }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "page-toolbar push-down simple-view"
-      }, this.state.expanded == 'expanded' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
-        className: "btn btn-primary btn-md btn-toolbar",
-        title: "Hide sidebar",
-        onClick: function onClick() {
-          return _this11.toggleLayout();
-        }
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
-        className: "fa fa-chevron-left"
-      })), this.state.expanded == 'collapsed' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
-        className: "btn btn-primary btn-md btn-toolbar",
-        title: "Show sidebar",
-        onClick: function onClick() {
-          return _this11.toggleLayout();
-        }
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
-        className: "fa fa-chevron-right"
-      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-default btn-md btn-toolbar",
         title: "New note",
         onClick: function onClick() {
@@ -88725,14 +88710,6 @@ function (_React$Component2) {
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-arrow-right"
-      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
-        className: "btn btn-default btn-md btn-toolbar",
-        title: "Delete this page",
-        onClick: function onClick() {
-          return _this11.deletePage();
-        }
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
-        className: "fa fa-times"
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Save",

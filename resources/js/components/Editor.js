@@ -883,18 +883,6 @@ class Editor extends React.Component {
                                 </button>
                             </div>
                             <div className="page-toolbar push-down simple-view">
-                                { 
-                                    this.state.expanded == 'expanded' && 
-                                    <button className="btn btn-primary btn-md btn-toolbar" title="Hide sidebar" onClick={() => this.toggleLayout()}>
-                                        <i className="fa fa-chevron-left"></i>
-                                    </button> 
-                                }
-                                { 
-                                    this.state.expanded == 'collapsed' && 
-                                    <button className="btn btn-primary btn-md btn-toolbar" title="Show sidebar" onClick={() => this.toggleLayout()}>
-                                        <i className="fa fa-chevron-right"></i>
-                                    </button> 
-                                }
                                 <button className="btn btn-default btn-md btn-toolbar" title="New note" onClick={() => this.updateNote({force: true, new: true})}>
                                     <i className="fa fa-plus"></i>
                                 </button>
@@ -904,9 +892,6 @@ class Editor extends React.Component {
                                 {this.state.page}/{this.state.note.stack.length}
                                 <button className="btn btn-default btn-md btn-toolbar" title="Go to next page" onClick={() => this.nextPage()}>
                                     <i className="fa fa-arrow-right"></i>
-                                </button>
-                                <button className="btn btn-default btn-md btn-toolbar" title="Delete this page" onClick={() => this.deletePage()}>
-                                    <i className="fa fa-times"></i>
                                 </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="Save" onClick={() => this.updateNote({force: true})}>
                                     <i className="fa fa-check"></i>

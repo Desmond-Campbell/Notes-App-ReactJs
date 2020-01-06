@@ -25,7 +25,7 @@
 <body>
     <div id="app">
 
-        <div id="loader">
+        <div id="loader" style="display: none">
             Wait...
         </div>
 

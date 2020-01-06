@@ -8,7 +8,7 @@ import 'react-quill/dist/quill.snow.css';
 import Select, { components } from 'react-select';
 import Parser from 'html-react-parser';
 
-var timer;
+var timer, timer1;
 
 function insertStar () {
   const cursorPosition = this.quill.getSelection().index
@@ -84,14 +84,27 @@ class SideBar extends React.Component {
                         query: { keywords: '', folder_id: null },
                         currentFolder: { _id: null, name: 'All Notes' },
                         currentSidebarView: 'notes',
-                        new_folder: ''
+                        new_folder: '',
+                        createFolderMode: 'create'
                     };
         this.search = this.search.bind(this);
+        timer1 = setInterval( () => { this.getNotes(null); }, 30000 );
 
+    }
+
+    loader(mode) {
+        if ( !mode ) {
+            jQuery('#main').css('filter', 'alpha(opacity=100)').css('opacity', '1');
+            jQuery('#loader').hide();
+        } else {
+            jQuery('#main').css('filter', 'alpha(opacity=60)').css('opacity', '0.6');
+            jQuery('#loader').show();
+        }
     }
 
     search(e){
         if(e.keyCode == 13 && e.target.value.length){
+            this.loader(1);
             this.setQuery(e.target.value);
             this.getNotes({...this.state.query, keywords: e.target.value});
         }
@@ -134,8 +147,13 @@ class SideBar extends React.Component {
 
     async getNotes ( query ) {
 
+        if ( typeof query === 'null' ) {
+            query = this.state.query;
+        }
+
         axios.post('/api/notes/get-recent', { query: query, params: { tested: true } })
           .then(response => {
+            this.loader(0);
             const notes = response.data.notes;
             const folders = response.data.folders;
             this.setState({...this.state, notes: notes, folders: folders});
@@ -145,8 +163,17 @@ class SideBar extends React.Component {
 
     async createFolder ( name ) {
 
-        axios.post('/api/notes/create-folder', { name: name })
+        this.loader(1);
+        
+        var payload = { name: name };
+
+        if ( this.state.createFolderMode == 'edit' ) {
+            payload.folder_id = this.state.currentFolder.id;
+        }
+
+        axios.post('/api/notes/create-folder', payload)
           .then(response => {
+            this.loader(0);
             const folders = response.data.folders;
             this.setState({...this.state, new_folder: '', folders: folders});
         });
@@ -155,6 +182,11 @@ class SideBar extends React.Component {
 
     editNote (id) {
         E.editNote(id);
+    }
+
+    editFolder() {
+        this.setState({...this.state, createFolderMode: 'edit'});
+        this.changeSidebarView('create-folder');
     }
 
     toggleLayout () {
@@ -196,8 +228,14 @@ class SideBar extends React.Component {
                     </div>
 
                     <div className="push-down">
-                        <label className="clickable" onClick={() => this.changeSidebarView('folders')}>
-                            <big><strong>{this.state.currentFolder.name}</strong></big>
+                        <label className="clickable">
+                            <big>
+                                <a href="#!" onClick={() => this.changeSidebarView('folders')}>
+                                    <strong>{this.state.currentFolder.name}</strong>
+                                </a>
+                            </big> &nbsp; 
+                            <a href="#!" onClick={() => this.getNotes({})}><i className="fas fa-sync-alt"></i></a> &nbsp; 
+                            <a href="#!" onClick={() => this.editFolder()}><i className="fas fa-edit"></i></a>
                         </label>
                     </div>
 
@@ -318,15 +356,26 @@ class Editor extends React.Component {
                         timeout: null,
                         saved: false,
                         lastsaved: 0,
-                        expanded: 'expanded'
+                        expanded: 'expanded',
+                        screenMode: 'normal'
                     };
 
         this.handleChange = this.handleChange.bind(this);
 
     }
 
-    is_null(value) {
-        return is_null(value);
+    isNull(value) {
+        return typeof value === 'null';
+    }
+
+    loader(mode) {
+        if ( !mode ) {
+            jQuery('#main').css('filter', 'alpha(opacity=100)').css('opacity', '1');
+            jQuery('#loader').hide();
+        } else {
+            jQuery('#main').css('filter', 'alpha(opacity=60)').css('opacity', '0.6');
+            jQuery('#loader').show();
+        }
     }
 
     componentDidMount() {
@@ -392,8 +441,10 @@ class Editor extends React.Component {
         
         this.setState({...this.state, note: {...this.state.note, _id: note_id}});
 
+        this.loader(1);
         axios.get('/api/notes/' + `${note_id}/get`)
           .then(response => {
+            this.loader(0);
             const result = response.data;
             var editMode = result.title != '' && result.title != 'Untitled Note' ? 'viewing' : 'editing';
             this.setState({...this.state, note_id: result._id, editTitleMode: editMode, currentView: 'note', currentSubView: defaultMode, note: {...this.state.note, editorHtml: result.stack[0], ...result}});
@@ -407,7 +458,7 @@ class Editor extends React.Component {
         const updated = this.state.updated;
         const lastsaved = this.state.lastsaved;
         
-        if ( !updated && !options.force ) return;
+        if ( !updated /*&& !options.force*/ ) return;
         
         var currenttime = Math.floor(Date.now() / 1000);
         var diff = currenttime - lastsaved;
@@ -416,6 +467,8 @@ class Editor extends React.Component {
 
             axios.post('/api/notes/update', { note: note, params: { note_id: this.state.note_id } })
               .then(response => {
+                
+                this.loader(0);
                 
                 this.setState({...this.state, updated: false, saved: true, lastsaved: currenttime})
                 setTimeout(() => this.setState({...this.state, saved: false}), 10000);
@@ -455,8 +508,11 @@ class Editor extends React.Component {
 
         if ( !confirm( 'Delete this note permanently?' ) ) return;
 
+        this.loader(1);
+        
         axios.post('/api/notes/' + `${this.state.note_id}/delete`, {})
           .then(response => {
+            this.loader(0);
             if ( typeof response.data.errors !== 'undefined' ) {
                 alert( response.data.errors );
             } else {
@@ -553,6 +609,7 @@ class Editor extends React.Component {
 
     search(e) {
         if(e.keyCode == 13 && e.target.value.length){
+            this.loader(1);
             this.getNotes({...this.state.browse.query, keywords: e.target.value});
         }
     }
@@ -565,7 +622,7 @@ class Editor extends React.Component {
 
     saveTitle(e) {
         if(e.keyCode == 13 && e.target.value.length){
-            this.setState({...this.state, editTitleMode: 'viewing'});
+            this.setState({...this.state, updated: true, editTitleMode: 'viewing'});
         }
     }
 
@@ -580,8 +637,13 @@ class Editor extends React.Component {
 
     async getNotes ( query ) {
 
+        if ( typeof query === 'null' ) {
+            query = this.state.browse.query;
+        }
+
         axios.post('/api/notes/browse', { query: query, params: { tested: true } })
           .then(response => {
+            this.loader(0);
             const notes = response.data.notes.notes;
             const folders = response.data.folders.folders;
             const query = response.data.query;
@@ -604,6 +666,11 @@ class Editor extends React.Component {
         this.setState(new_state);
     }
 
+    handleChangeFolder(e) {
+        this.setState({...this.state, updated: true, note: {...this.state.note, folder_id: e.value}});
+        this.updateNote({});
+    }
+
     readNote () {
 
         this.setState({...this.state, currentSubView: 'read', expanded: 'collapsed', editTitleMode: 'viewing'});
@@ -615,7 +682,27 @@ class Editor extends React.Component {
         this.setState({...this.state, currentSubView: 'editor', expanded: 'expanded'});
 
     }
-  
+
+    simpleView () {
+
+        this.setState({...this.state, expanded: 'collapsed', editTitleMode: 'viewing', screenMode: 'simple'});
+        jQuery('#top-nav').hide();
+        jQuery('.ql-toolbar').hide();
+        jQuery('.normal-view').hide();
+        jQuery('.simple-view').show();
+
+    }
+
+    normalView () {
+
+        this.setState({...this.state, expanded: 'expanded', editTitleMode: 'viewing', screenMode: 'normal'});
+        jQuery('#top-nav').show();
+        jQuery('.ql-toolbar').show();
+        jQuery('.normal-view').show();
+        jQuery('.simple-view').hide();
+
+    }
+
     render () {
         return (
             <div>
@@ -660,13 +747,27 @@ class Editor extends React.Component {
                         </div>
 
                         <div className="form-group push-down">
-                            <input type="text" 
-                                className="form-control" 
-                                defaultValue={this.state.browse.query.keyword} 
-                                onKeyDown={e => this.search(e)} 
-                                autoComplete="off"
-                            />
+
+                            <div className="input-group mb-3">
+                                <div className="input-group-prepend">
+                                    <span className="input-group-text" id="btn-grp-3">
+                                       <a href="#!" onClick={() => this.getNotes(null)}><i className="fas fa-sync-alt"></i></a>
+                                    </span>
+                                </div>
+                                <input type="text" 
+                                    className="form-control" 
+                                    defaultValue={this.state.browse.query.keyword} 
+                                    onKeyDown={e => this.search(e)} 
+                                    autoComplete="off"
+                                    aria-label="" 
+                                    aria-describedby="btn-grp-3"
+                                />
+                            </div>
+                            
                         </div>
+
+                            
+
 
                         <div className="push-down">
 
@@ -733,7 +834,7 @@ class Editor extends React.Component {
                         { this.state.currentSubView == 'editor' &&
                         
                         <div>
-                            <div className="page-toolbar push-down">
+                            <div className="page-toolbar push-down normal-view">
                                 { 
                                     this.state.expanded == 'expanded' && 
                                     <button className="btn btn-primary btn-md btn-toolbar" title="Hide sidebar" onClick={() => this.toggleLayout()}>
@@ -774,8 +875,47 @@ class Editor extends React.Component {
                                 <button className="btn btn-default btn-md btn-toolbar" title="Read mode" onClick={() => this.readNote()}>
                                     <i className="fab fa-readme"></i>
                                 </button>
+                                <button className="btn btn-default btn-md btn-toolbar" title="Simple view" onClick={() => this.simpleView()}>
+                                    <i className="fas fa-expand"></i>
+                                </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="Note properties" onClick={() => this.changeSubView('properties')}>
                                     <i className="fa fa-sliders-h"></i>
+                                </button>
+                            </div>
+                            <div className="page-toolbar push-down simple-view">
+                                { 
+                                    this.state.expanded == 'expanded' && 
+                                    <button className="btn btn-primary btn-md btn-toolbar" title="Hide sidebar" onClick={() => this.toggleLayout()}>
+                                        <i className="fa fa-chevron-left"></i>
+                                    </button> 
+                                }
+                                { 
+                                    this.state.expanded == 'collapsed' && 
+                                    <button className="btn btn-primary btn-md btn-toolbar" title="Show sidebar" onClick={() => this.toggleLayout()}>
+                                        <i className="fa fa-chevron-right"></i>
+                                    </button> 
+                                }
+                                <button className="btn btn-default btn-md btn-toolbar" title="New note" onClick={() => this.updateNote({force: true, new: true})}>
+                                    <i className="fa fa-plus"></i>
+                                </button>
+                                <button className="btn btn-default btn-md btn-toolbar" title="Go to previous page" onClick={() => this.previousPage()}>
+                                    <i className="fa fa-arrow-left"></i>
+                                </button>
+                                {this.state.page}/{this.state.note.stack.length}
+                                <button className="btn btn-default btn-md btn-toolbar" title="Go to next page" onClick={() => this.nextPage()}>
+                                    <i className="fa fa-arrow-right"></i>
+                                </button>
+                                <button className="btn btn-default btn-md btn-toolbar" title="Delete this page" onClick={() => this.deletePage()}>
+                                    <i className="fa fa-times"></i>
+                                </button>
+                                <button className="btn btn-default btn-md btn-toolbar" title="Save" onClick={() => this.updateNote({force: true})}>
+                                    <i className="fa fa-check"></i>
+                                </button>
+                                <button className="btn btn-default btn-md btn-toolbar" title="Read mode" onClick={() => this.readNote()}>
+                                    <i className="fab fa-readme"></i>
+                                </button>
+                                <button className="btn btn-default btn-md btn-toolbar" title="Normal view" onClick={() => this.normalView()}>
+                                    <i className="fas fa-compress-arrows-alt"></i>
                                 </button>
                             </div>
                             <div className="push-down">
@@ -809,8 +949,9 @@ class Editor extends React.Component {
                                 <label className="label"><strong>Folder</strong></label>
                                 <Select
                                     className="col-md-6"
-                                    options={this.state.folders.filter(item => !is_null(item._id))}
+                                    options={this.state.folders.filter(item => !this.isNull(item._id))}
                                     defaultValue={this.state.note.folder}
+                                    onChange={(e) => this.handleChangeFolder(e)}
                                  />
                             </div>
 
@@ -866,6 +1007,14 @@ class Editor extends React.Component {
                                 <button className="btn btn-default btn-md btn-toolbar" title="Edit mode" onClick={() => this.backToEditMode()}>
                                     <i className="fas fa-edit"></i>
                                 </button>
+                                { this.state.screenMode == 'normal' &&
+                                <button className="btn btn-default btn-md btn-toolbar" title="Simple view" onClick={() => this.simpleView()}>
+                                    <i className="fas fa-expand"></i>
+                                </button> }
+                                { this.state.screenMode == 'simple' &&
+                                <button className="btn btn-default btn-md btn-toolbar" title="Normal view" onClick={() => this.normalView()}>
+                                    <i className="fas fa-compress-arrows-alt"></i>
+                                </button> }
                                 <button className="btn btn-default btn-md btn-toolbar" title="Note properties" onClick={() => this.changeSubView('properties')}>
                                     <i className="fa fa-sliders-h"></i>
                                 </button>
@@ -879,10 +1028,8 @@ class Editor extends React.Component {
 
                                 {this.state.note.stack.map( item => {
                                     return (
-                                        <div key={item} className="push-down">
-                                            <div>
-                                                {Parser(item)}
-                                            </div>
+                                        <div key={item} className="">
+                                            {Parser(item)}
                                         </div>
                                     )
                                 })}

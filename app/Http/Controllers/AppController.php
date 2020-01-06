@@ -47,6 +47,9 @@ class AppController extends Controller
 
         if ( $response->stack[0] ?? null ) {
             $response->editorHtml = $response->stack[0];
+        } else {
+            $response->stack = [ '' ];
+            $response->editorHtml = '';
         }
 
         return response()->json( $response );
@@ -74,7 +77,12 @@ class AppController extends Controller
 
         $payload = [];
         $payload['user_id'] = Auth::user()->id;
-        $payload['paging'] = [ 'limit' => 20, 'sortField' => 'updated_at', 'sortOder' => 'desc' ];
+        $payload['paging'] = [ 'limit' => 20, 
+                                'sortField' => 'updated_at', 
+                                'sortOder' => 'desc', 
+                                'folder_id' => $r->input('query')['folder_id'] ?? null,
+                                'keywords' => $r->input('query')['keywords'] ?? '' 
+                            ];
 
         $service_name = $this->service_name;
         $uri = '/notes/browse';
@@ -104,7 +112,13 @@ class AppController extends Controller
 
         $payload = [];
         $payload['user_id'] = Auth::user()->id;
-        $payload['paging'] = [ 'limit' => 100, 'sortField' => 'updated_at', 'sortOder' => 'desc' ];
+        $payload['paging'] = [ 'limit' => 100, 
+                                'sortField' => 'updated_at', 
+                                'sortOder' => 'desc', 
+                                'keywords' => $query['keywords'] ?? '' ,
+                                'folder_id' => $query['folder_id'] ?? '' ,
+                                'currentPage' => $query['currentPage'] ?? 1 
+                            ];
 
         $service_name = $this->service_name;
         $uri = '/notes/browse';
@@ -124,7 +138,7 @@ class AppController extends Controller
             $folder->value = $folder->_id;
         }
 
-        return response()->json( [ 'notes' => $notes, 'folders' => $folders, 'query' => $query ] );
+        return response()->json( [ 'notes' => $notes, 'folders' => $folders, 'query' => $notes->paging ] );
 
     }
 
@@ -139,11 +153,11 @@ class AppController extends Controller
         $data['title'] = $note['title'] ?? null;
         $data['stack'] = $note['stack'] ?? [];
             if ( count( $data['stack'] ) < 1 ) $data['stack'] = [ '' ];
-        $data['folder_id'] = $note['folder']['_id'] ?? null;
+        $data['folder_id'] = $note['folder_id'] ?? null;
         $data['is_private'] = $note['is_private'] ?? false;
         $data['tags'] = $note['tags'] ?? false;
 
-        if ( $data['title'] == 'Untitled Note' && $data['stack'][0] == '' && count( $data['stack'] ) == 1 ) {
+        if ( strtolower( $data['title'] ) == 'untitled note' && trim( strip_tags( $data['stack'][0] ) ) == '' && count( $data['stack'] ) == 1 ) {
 
             return response()->json( [ 'note' => [ 'title' => 'Untitled Note', 'editorHtml' => '', '_id' => null, 'message' => 'Original requested note not found. This is a new note.', 'stack' => [ '' ] ] ] );
 
@@ -175,7 +189,7 @@ class AppController extends Controller
         $name = $r->input('name');
 
         $data = [];
-        $data['_id'] = $r->_id;
+        $data['_id'] = $r->folder_id;
         $data['name'] = $r->input('name') ?? null;
 
         if ( $data['name'] == '' ) {

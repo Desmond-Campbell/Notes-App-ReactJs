@@ -87373,7 +87373,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 
 
 
-var timer;
+var timer, timer1;
 
 function insertStar() {
   var cursorPosition = this.quill.getSelection().index;
@@ -87493,13 +87493,28 @@ function (_React$Component) {
       new_folder: ''
     };
     _this.search = _this.search.bind(_assertThisInitialized(_this));
+    timer1 = setInterval(function () {
+      _this.getNotes(null);
+    }, 30000);
     return _this;
   }
 
   _createClass(SideBar, [{
+    key: "loader",
+    value: function loader(mode) {
+      if (!mode) {
+        jQuery('#main').css('filter', 'alpha(opacity=100)').css('opacity', '1');
+        jQuery('#loader').hide();
+      } else {
+        jQuery('#main').css('filter', 'alpha(opacity=60)').css('opacity', '0.6');
+        jQuery('#loader').show();
+      }
+    }
+  }, {
     key: "search",
     value: function search(e) {
       if (e.keyCode == 13 && e.target.value.length) {
+        this.loader(1);
         this.setQuery(e.target.value);
         this.getNotes(_objectSpread({}, this.state.query, {
           keywords: e.target.value
@@ -87559,12 +87574,18 @@ function (_React$Component) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                if (typeof query === 'null') {
+                  query = this.state.query;
+                }
+
                 axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/get-recent', {
                   query: query,
                   params: {
                     tested: true
                   }
                 }).then(function (response) {
+                  _this2.loader(0);
+
                   var notes = response.data.notes;
                   var folders = response.data.folders;
 
@@ -87574,12 +87595,12 @@ function (_React$Component) {
                   }));
                 });
 
-              case 1:
+              case 2:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee);
+        }, _callee, this);
       }));
 
       function getNotes(_x) {
@@ -87596,13 +87617,23 @@ function (_React$Component) {
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(name) {
         var _this3 = this;
 
+        var payload;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/create-folder', {
+                this.loader(1);
+                payload = {
                   name: name
-                }).then(function (response) {
+                };
+
+                if (this.state.createFolderMode == 'edit') {
+                  payload.folder_id = this.state.currentFolder.id;
+                }
+
+                axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/create-folder', payload).then(function (response) {
+                  _this3.loader(0);
+
                   var folders = response.data.folders;
 
                   _this3.setState(_objectSpread({}, _this3.state, {
@@ -87611,12 +87642,12 @@ function (_React$Component) {
                   }));
                 });
 
-              case 1:
+              case 4:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2);
+        }, _callee2, this);
       }));
 
       function createFolder(_x2) {
@@ -87629,6 +87660,14 @@ function (_React$Component) {
     key: "editNote",
     value: function editNote(id) {
       E.editNote(id);
+    }
+  }, {
+    key: "editFolder",
+    value: function editFolder() {
+      this.setState(_objectSpread({}, this.state, {
+        createFolderMode: 'edit'
+      }));
+      this.changeSidebarView('create-folder');
     }
   }, {
     key: "toggleLayout",
@@ -87690,11 +87729,27 @@ function (_React$Component) {
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "push-down"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
-        className: "clickable",
+        className: "clickable"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("big", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
         onClick: function onClick() {
           return _this4.changeSidebarView('folders');
         }
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("big", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("strong", null, this.state.currentFolder.name)))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("strong", null, this.state.currentFolder.name))), " \xA0", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: function onClick() {
+          return _this4.getNotes({});
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fas fa-sync-alt"
+      })), " \xA0", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: function onClick() {
+          return _this4.editFolder();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fas fa-edit"
+      })))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "push-down"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("ul", {
         className: "sidebar-list"
@@ -87836,27 +87891,29 @@ function (_React$Component2) {
       timeout: null,
       saved: false,
       lastsaved: 0,
-      expanded: 'expanded'
+      expanded: 'expanded',
+      screenMode: 'normal'
     };
     _this5.handleChange = _this5.handleChange.bind(_assertThisInitialized(_this5));
     return _this5;
   }
 
   _createClass(Editor, [{
-    key: "is_null",
-    value: function (_is_null) {
-      function is_null(_x3) {
-        return _is_null.apply(this, arguments);
+    key: "isNull",
+    value: function isNull(value) {
+      return typeof value === 'null';
+    }
+  }, {
+    key: "loader",
+    value: function loader(mode) {
+      if (!mode) {
+        jQuery('#main').css('filter', 'alpha(opacity=100)').css('opacity', '1');
+        jQuery('#loader').hide();
+      } else {
+        jQuery('#main').css('filter', 'alpha(opacity=60)').css('opacity', '0.6');
+        jQuery('#loader').show();
       }
-
-      is_null.toString = function () {
-        return _is_null.toString();
-      };
-
-      return is_null;
-    }(function (value) {
-      return is_null(value);
-    })
+    }
   }, {
     key: "componentDidMount",
     value: function componentDidMount() {
@@ -87931,7 +87988,10 @@ function (_React$Component2) {
           _id: note_id
         })
       }));
+      this.loader(1);
       axios__WEBPACK_IMPORTED_MODULE_3___default.a.get('/api/notes/' + "".concat(note_id, "/get")).then(function (response) {
+        _this7.loader(0);
+
         var result = response.data;
         var editMode = result.title != '' && result.title != 'Untitled Note' ? 'viewing' : 'editing';
 
@@ -87963,7 +88023,7 @@ function (_React$Component2) {
                 updated = this.state.updated;
                 lastsaved = this.state.lastsaved;
 
-                if (!(!updated && !options.force)) {
+                if (updated) {
                   _context3.next = 5;
                   break;
                 }
@@ -87981,6 +88041,8 @@ function (_React$Component2) {
                       note_id: this.state.note_id
                     }
                   }).then(function (response) {
+                    _this8.loader(0);
+
                     _this8.setState(_objectSpread({}, _this8.state, {
                       updated: false,
                       saved: true,
@@ -88025,7 +88087,7 @@ function (_React$Component2) {
         }, _callee3, this);
       }));
 
-      function updateNote(_x4) {
+      function updateNote(_x3) {
         return _updateNote.apply(this, arguments);
       }
 
@@ -88051,7 +88113,10 @@ function (_React$Component2) {
                 return _context4.abrupt("return");
 
               case 2:
+                this.loader(1);
                 axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/' + "".concat(this.state.note_id, "/delete"), {}).then(function (response) {
+                  _this9.loader(0);
+
                   if (typeof response.data.errors !== 'undefined') {
                     alert(response.data.errors);
                   } else {
@@ -88059,7 +88124,7 @@ function (_React$Component2) {
                   }
                 });
 
-              case 3:
+              case 4:
               case "end":
                 return _context4.stop();
             }
@@ -88067,7 +88132,7 @@ function (_React$Component2) {
         }, _callee4, this);
       }));
 
-      function deleteNote(_x5) {
+      function deleteNote(_x4) {
         return _deleteNote.apply(this, arguments);
       }
 
@@ -88191,6 +88256,7 @@ function (_React$Component2) {
     key: "search",
     value: function search(e) {
       if (e.keyCode == 13 && e.target.value.length) {
+        this.loader(1);
         this.getNotes(_objectSpread({}, this.state.browse.query, {
           keywords: e.target.value
         }));
@@ -88210,6 +88276,7 @@ function (_React$Component2) {
     value: function saveTitle(e) {
       if (e.keyCode == 13 && e.target.value.length) {
         this.setState(_objectSpread({}, this.state, {
+          updated: true,
           editTitleMode: 'viewing'
         }));
       }
@@ -88242,12 +88309,18 @@ function (_React$Component2) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
+                if (typeof query === 'null') {
+                  query = this.state.browse.query;
+                }
+
                 axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/browse', {
                   query: query,
                   params: {
                     tested: true
                   }
                 }).then(function (response) {
+                  _this10.loader(0);
+
                   var notes = response.data.notes.notes;
                   var folders = response.data.folders.folders;
                   var query = response.data.query;
@@ -88261,15 +88334,15 @@ function (_React$Component2) {
                   }));
                 });
 
-              case 1:
+              case 2:
               case "end":
                 return _context5.stop();
             }
           }
-        }, _callee5);
+        }, _callee5, this);
       }));
 
-      function getNotes(_x6) {
+      function getNotes(_x5) {
         return _getNotes2.apply(this, arguments);
       }
 
@@ -88303,6 +88376,17 @@ function (_React$Component2) {
       this.setState(new_state);
     }
   }, {
+    key: "handleChangeFolder",
+    value: function handleChangeFolder(e) {
+      this.setState(_objectSpread({}, this.state, {
+        updated: true,
+        note: _objectSpread({}, this.state.note, {
+          folder_id: e.value
+        })
+      }));
+      this.updateNote({});
+    }
+  }, {
     key: "readNote",
     value: function readNote() {
       this.setState(_objectSpread({}, this.state, {
@@ -88318,6 +88402,32 @@ function (_React$Component2) {
         currentSubView: 'editor',
         expanded: 'expanded'
       }));
+    }
+  }, {
+    key: "simpleView",
+    value: function simpleView() {
+      this.setState(_objectSpread({}, this.state, {
+        expanded: 'collapsed',
+        editTitleMode: 'viewing',
+        screenMode: 'simple'
+      }));
+      jQuery('#top-nav').hide();
+      jQuery('.ql-toolbar').hide();
+      jQuery('.normal-view').hide();
+      jQuery('.simple-view').show();
+    }
+  }, {
+    key: "normalView",
+    value: function normalView() {
+      this.setState(_objectSpread({}, this.state, {
+        expanded: 'expanded',
+        editTitleMode: 'viewing',
+        screenMode: 'normal'
+      }));
+      jQuery('#top-nav').show();
+      jQuery('.ql-toolbar').show();
+      jQuery('.normal-view').show();
+      jQuery('.simple-view').hide();
     }
   }, {
     key: "render",
@@ -88379,15 +88489,31 @@ function (_React$Component2) {
         className: "fa fa-chevron-right"
       }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "form-group push-down"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "input-group mb-3"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "input-group-prepend"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
+        className: "input-group-text",
+        id: "btn-grp-3"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: function onClick() {
+          return _this11.getNotes(null);
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fas fa-sync-alt"
+      })))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "text",
         className: "form-control",
         defaultValue: this.state.browse.query.keyword,
         onKeyDown: function onKeyDown(e) {
           return _this11.search(e);
         },
-        autoComplete: "off"
-      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        autoComplete: "off",
+        "aria-label": "",
+        "aria-describedby": "btn-grp-3"
+      }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "push-down"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row list-grid"
@@ -88441,7 +88567,7 @@ function (_React$Component2) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(SaveMessage, {
         visible: !this.state.saved
       }), this.state.note.title)), this.state.currentSubView == 'editor' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        className: "page-toolbar push-down"
+        className: "page-toolbar push-down normal-view"
       }, this.state.expanded == 'expanded' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-primary btn-md btn-toolbar",
         title: "Hide sidebar",
@@ -88540,12 +88666,99 @@ function (_React$Component2) {
         className: "fab fa-readme"
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-default btn-md btn-toolbar",
+        title: "Simple view",
+        onClick: function onClick() {
+          return _this11.simpleView();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fas fa-expand"
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
         title: "Note properties",
         onClick: function onClick() {
           return _this11.changeSubView('properties');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-sliders-h"
+      }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "page-toolbar push-down simple-view"
+      }, this.state.expanded == 'expanded' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-primary btn-md btn-toolbar",
+        title: "Hide sidebar",
+        onClick: function onClick() {
+          return _this11.toggleLayout();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-chevron-left"
+      })), this.state.expanded == 'collapsed' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-primary btn-md btn-toolbar",
+        title: "Show sidebar",
+        onClick: function onClick() {
+          return _this11.toggleLayout();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-chevron-right"
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "New note",
+        onClick: function onClick() {
+          return _this11.updateNote({
+            force: true,
+            "new": true
+          });
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-plus"
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Go to previous page",
+        onClick: function onClick() {
+          return _this11.previousPage();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-arrow-left"
+      })), this.state.page, "/", this.state.note.stack.length, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Go to next page",
+        onClick: function onClick() {
+          return _this11.nextPage();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-arrow-right"
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Delete this page",
+        onClick: function onClick() {
+          return _this11.deletePage();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-times"
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Save",
+        onClick: function onClick() {
+          return _this11.updateNote({
+            force: true
+          });
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-check"
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Read mode",
+        onClick: function onClick() {
+          return _this11.readNote();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fab fa-readme"
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Normal view",
+        onClick: function onClick() {
+          return _this11.normalView();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fas fa-compress-arrows-alt"
       }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "push-down"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_quill__WEBPACK_IMPORTED_MODULE_4___default.a, {
@@ -88575,9 +88788,12 @@ function (_React$Component2) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("strong", null, "Folder")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_select__WEBPACK_IMPORTED_MODULE_6__["default"], {
         className: "col-md-6",
         options: this.state.folders.filter(function (item) {
-          return !is_null(item._id);
+          return !_this11.isNull(item._id);
         }),
-        defaultValue: this.state.note.folder
+        defaultValue: this.state.note.folder,
+        onChange: function onChange(e) {
+          return _this11.handleChangeFolder(e);
+        }
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
@@ -88660,6 +88876,22 @@ function (_React$Component2) {
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-edit"
+      })), this.state.screenMode == 'normal' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Simple view",
+        onClick: function onClick() {
+          return _this11.simpleView();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fas fa-expand"
+      })), this.state.screenMode == 'simple' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "btn btn-default btn-md btn-toolbar",
+        title: "Normal view",
+        onClick: function onClick() {
+          return _this11.normalView();
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fas fa-compress-arrows-alt"
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Note properties",
@@ -88675,8 +88907,8 @@ function (_React$Component2) {
       }, this.state.note.stack.map(function (item) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
           key: item,
-          className: "push-down"
-        }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, html_react_parser__WEBPACK_IMPORTED_MODULE_7___default()(item)));
+          className: ""
+        }, html_react_parser__WEBPACK_IMPORTED_MODULE_7___default()(item));
       }))))));
     }
   }]);

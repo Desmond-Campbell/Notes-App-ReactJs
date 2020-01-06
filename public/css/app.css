@@ -1,0 +1,134 @@
+.hidden {
+  display: none;
+}
+
+.saved {
+  display: none;
+  color: darkgreen;
+}
+
+.saved-visible {
+  display: inline-block;
+}
+
+.push-down {
+  margin-top: 15px;
+}
+
+.page-toolbar {
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+.btn-toolbar {
+  display: inline-block;
+  outline: none !important;
+  -box-shadow: none !important;
+  -khtml-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  border: none;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.btn-toolbar:hover {
+  background: #42a6ba;
+  color: #FFF;
+}
+
+.sidebar-list {
+  margin-left: -40px;
+}
+
+.sidebar-list,
+.sidebar-list li {
+  list-style: none;
+  list-style-type: none;
+}
+
+.sidebar-list li {
+  padding-top: 10px;
+  border-top: solid 1px #FFF;
+  border-bottom: solid 1px #dbe0de;
+}
+
+.sidebar-list li * {
+  cursor: pointer !important;
+}
+
+.sidebar-list li:hover .list-item-title {
+  color: #354284;
+}
+
+.sidebar-list li .list-item-title {
+  display: block;
+  line-height: 90%;
+}
+
+.sidebar-list li .list-item-subtitle {
+  font-size: 80%;
+  display: block;
+  color: #5a6168;
+  line-height: 90%;
+}
+
+#sidebar {
+  background: #f7f9f6;
+  padding: 10px;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.list-grid {
+  padding: 15px;
+}
+
+.list-grid .grid-node {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.list-grid .grid-node .grid-node-title {
+  font-weight: light;
+  color: #0e3b56;
+  display: block;
+  font-size: 125%;
+}
+
+.list-grid .grid-node .grid-node-subtitle {
+  display: block;
+}
+
+.list-grid .grid-node .grid-node-subtitle .grid-node-folder-name {
+  display: block;
+  color: #5baec1;
+  font-size: 90%;
+}
+
+.list-grid .grid-node .grid-node-subtitle .grid-node-date {
+  color: #757575;
+  font-size: 75%;
+}
+
+#note_title {
+  font-size: 185%;
+  border: none;
+  color: #000;
+  border-top: solid 1px #d6d6d6;
+  border-bottom: solid 1px #b2b0b0;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -khtml-border-radius: 0;
+  -webkitborder-radius: 0;
+}
+
+.ql-container {
+  border: none !important;
+}
+
+.ql-toolbar {
+  border: none !important;
+  background: #edf4f8;
+}
+

@@ -701,6 +701,10 @@ class Editor extends React.Component {
         jQuery('.normal-view').show();
         jQuery('.simple-view').hide();
 
+        if ( isMobile() ) {
+            this.toggleLayout();
+        }
+
     }
 
     render () {

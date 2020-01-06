@@ -88429,6 +88429,10 @@ function (_React$Component2) {
       jQuery('.ql-toolbar').show();
       jQuery('.normal-view').show();
       jQuery('.simple-view').hide();
+
+      if (isMobile()) {
+        this.toggleLayout();
+      }
     }
   }, {
     key: "render",

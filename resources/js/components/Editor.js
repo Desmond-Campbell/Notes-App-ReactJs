@@ -424,7 +424,7 @@ class Editor extends React.Component {
         this.getNotes({});
 
         if ( isMobile() ) {
-            this.toggleLayout();
+            this.switchToolbarMode();
         }
 
         timer = setInterval( () => { this.updateNote({force: true}); }, 10000 );

@@ -467,8 +467,11 @@ class Editor extends React.Component {
         
         var defaultMode = 'editor';
 
-        if ( isMobile() && note_id > 0 ) {
+        if ( isMobile() ) {
             this.toggleLayout();
+        }
+
+        if ( note_id ) {
             defaultMode = 'read';
         }
 
@@ -859,7 +862,7 @@ class Editor extends React.Component {
 
                         <div className="editor-title-container">
                             { 
-                                this.state.editTitleMode == 'editing' && 
+                                ( this.state.editTitleMode == 'editing' || this.state.editTitleMode == 'viewing' ) && 
                                 
                                 <div>
 
@@ -877,7 +880,7 @@ class Editor extends React.Component {
 
                                 </div> }
                             { 
-                                this.state.editTitleMode == 'viewing' && 
+                                this.state.editTitleMode == 'OBSOLETE' && 
                                 <h2 className="note-title clickable" onClick={() => this.editTitle()}>
                                     <SaveMessage visible={!this.state.saved} />
                                     {this.state.note.title}

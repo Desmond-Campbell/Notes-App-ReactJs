@@ -88035,8 +88035,11 @@ function (_React$Component2) {
 
       var defaultMode = 'editor';
 
-      if (isMobile() && note_id > 0) {
+      if (isMobile()) {
         this.toggleLayout();
+      }
+
+      if (note_id) {
         defaultMode = 'read';
       }
 
@@ -88616,7 +88619,7 @@ function (_React$Component2) {
         className: this.state.expanded == 'expanded' ? 'col-md-9' : 'col-md-12'
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "editor-title-container"
-      }, this.state.editTitleMode == 'editing' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }, (this.state.editTitleMode == 'editing' || this.state.editTitleMode == 'viewing') && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "text",
         title: "Search notes by keywords",
         className: "form-control",
@@ -88632,7 +88635,7 @@ function (_React$Component2) {
         },
         id: "note_title",
         autoComplete: "off"
-      })), this.state.editTitleMode == 'viewing' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h2", {
+      })), this.state.editTitleMode == 'OBSOLETE' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h2", {
         className: "note-title clickable",
         onClick: function onClick() {
           return _this12.editTitle();

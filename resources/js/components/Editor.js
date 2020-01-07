@@ -1096,12 +1096,24 @@ class Editor extends React.Component {
  */
 Editor.modules = {
   toolbar: [
-    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-    [{size: []}],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{'list': 'ordered'}, {'list': 'bullet'}, 
-     {'indent': '-1'}, {'indent': '+1'}],
-    ['link', 'image', 'video'],
+    [ 'bold', 
+        'italic', 
+        'underline', 
+        { 'size': [false, 'small', 'large', 'huge'] }, 
+        { 'header': [1, 2, 3, 4, 5, 6, false] }, 
+        { 'font': [] }, 'strike', 'blockquote', 'code-block', 
+        { 'color': [] }, 
+        { 'background': [] }, 
+        { 'script': 'sub'}, 
+        { 'script': 'super' }, 
+        {'list': 'ordered'}, 
+        {'list': 'bullet'}, 
+        {'indent': '-1'}, 
+        {'indent': '+1'}, 
+        { 'align': [] }, 
+        'link', 
+        'image'
+    ],
     ['clean']
   ],
   clipboard: {

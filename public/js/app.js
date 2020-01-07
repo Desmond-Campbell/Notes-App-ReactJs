@@ -88974,15 +88974,21 @@ function (_React$Component2) {
 
 
 Editor.modules = {
-  toolbar: [[{
-    'header': '1'
+  toolbar: [['bold', 'italic', 'underline', {
+    'size': [false, 'small', 'large', 'huge']
   }, {
-    'header': '2'
+    'header': [1, 2, 3, 4, 5, 6, false]
   }, {
     'font': []
-  }], [{
-    size: []
-  }], ['bold', 'italic', 'underline', 'strike', 'blockquote'], [{
+  }, 'strike', 'blockquote', 'code-block', {
+    'color': []
+  }, {
+    'background': []
+  }, {
+    'script': 'sub'
+  }, {
+    'script': 'super'
+  }, {
     'list': 'ordered'
   }, {
     'list': 'bullet'
@@ -88990,7 +88996,9 @@ Editor.modules = {
     'indent': '-1'
   }, {
     'indent': '+1'
-  }], ['link', 'image', 'video'], ['clean']],
+  }, {
+    'align': []
+  }, 'link', 'image'], ['clean']],
   clipboard: {
     // toggle to add extra line breaks when pasting HTML:
     matchVisual: false

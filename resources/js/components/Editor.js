@@ -737,7 +737,7 @@ class Editor extends React.Component {
 
     readNote () {
 
-        this.setState({...this.state, currentSubView: 'read', expanded: 'collapsed', editTitleMode: 'viewing'});
+        this.setState({...this.state, currentSubView: 'read', editTitleMode: 'viewing'});
 
     }
 
@@ -889,14 +889,14 @@ class Editor extends React.Component {
 
                         <div className="editor-title-container">
                             { 
-                                ( this.state.editTitleMode == 'editing' || this.state.editTitleMode == 'viewing' ) && 
+                                ( this.state.editTitleMode == 'editing' ) && 
                                 
                                 <div>
 
                                     <input 
                                         type="text" 
                                         title="Search notes by keywords"
-                                        className="form-control" 
+                                        className="f/orm-control" 
                                         onChange={e => this.updateInput("title", e.target.value)}
                                         value={this.state.note.title}
                                         onKeyDown={ e => this.saveTitle(e)}
@@ -907,9 +907,9 @@ class Editor extends React.Component {
 
                                 </div> }
                             { 
-                                this.state.editTitleMode == 'OBSOLETE' && 
+                                this.state.editTitleMode == 'viewing' && 
                                 <h2 className="note-title clickable" onClick={() => this.editTitle()}>
-                                    <SaveMessage visible={!this.state.saved} />
+                                    <SaveMessage visible={!this.state.saved && false} />
                                     {this.state.note.title}
                                 </h2>
                             }
@@ -1058,8 +1058,8 @@ class Editor extends React.Component {
 
                         { this.state.currentSubView == 'read' &&
                         
-                        <div id="main-toolbar read-container">
-                            <div className="page-toolbar push-down">
+                        <div>
+                            <div id="main-toolbar" className="page-toolbar push-down">
                                 { 
                                     this.state.expanded == 'expanded' && 
                                     <button className="btn btn-primary btn-md btn-toolbar" title="Hide sidebar" onClick={() => this.toggleLayout()}>
@@ -1099,7 +1099,7 @@ class Editor extends React.Component {
                         </div> }
 
                         { this.state.currentSubView == 'read' &&
-                        <div className="row">
+                        <div className="row read-container">
 
                             <div className="col-md-12">
 

@@ -396,7 +396,8 @@ class Editor extends React.Component {
                         saved: false,
                         lastsaved: 0,
                         expanded: 'expanded',
-                        screenMode: 'normal'
+                        screenMode: 'normal',
+                        toolbarViewMode: 1
                     };
 
         this.handleChange = this.handleChange.bind(this);
@@ -761,6 +762,23 @@ class Editor extends React.Component {
 
     }
 
+    switchToolbarMode () {
+        /*var toolbarViewMode = this.state.toolbarViewMode;
+
+        if ( toolbarViewMode == 2 ) {
+            jQuery('.ql-toolbar').show();
+            toolbarViewMode = 1;
+        } else {
+            jQuery('.ql-toolbar').hide();
+            toolbarViewMode = 2;
+        }
+
+        this.setState({...this.state, toolbarViewMode: toolbarViewMode});*/
+
+        jQuery('.ql-toolbar').slideToggle();
+
+    }
+
     render () {
         return (
             <div>
@@ -891,7 +909,7 @@ class Editor extends React.Component {
 
                         { this.state.currentSubView == 'editor' &&
                         
-                        <div>
+                        <div id="main-toolbar">
                             <div className="page-toolbar push-down normal-view">
                                 { 
                                     this.state.expanded == 'expanded' && 
@@ -905,6 +923,9 @@ class Editor extends React.Component {
                                         <i className="fa fa-chevron-right"></i>
                                     </button> 
                                 }
+                                <button className="btn btn-default btn-md btn-toolbar" title="Toolbar Mode" onClick={() => this.switchToolbarMode()}>
+                                    <i className="fas fa-palette"></i>
+                                </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="New note" onClick={() => this.updateNote({force: true, new: true})}>
                                     <i className="fa fa-plus"></i>
                                 </button>
@@ -939,8 +960,12 @@ class Editor extends React.Component {
                                 <button className="btn btn-default btn-md btn-toolbar" title="Note properties" onClick={() => this.changeSubView('properties')}>
                                     <i className="fa fa-sliders-h"></i>
                                 </button>
+                                
                             </div>
                             <div className="page-toolbar push-down simple-view">
+                                <button className="btn btn-default btn-md btn-toolbar" title="Toolbar Mode" onClick={() => this.switchToolbarMode()}>
+                                    <i className="fas fa-palette"></i>
+                                </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="New note" onClick={() => this.updateNote({force: true, new: true})}>
                                     <i className="fa fa-plus"></i>
                                 </button>
@@ -961,7 +986,7 @@ class Editor extends React.Component {
                                     <i className="fas fa-compress-arrows-alt"></i>
                                 </button>
                             </div>
-                            <div className="push-down">
+                            <div className="push-down editor-container">
                                 <ReactQuill 
                                     theme={this.state.theme}
                                     onChange={this.handleChange}
@@ -1024,7 +1049,7 @@ class Editor extends React.Component {
 
                         { this.state.currentSubView == 'read' &&
                         
-                        <div>
+                        <div id="main-toolbar read-container">
                             <div className="page-toolbar push-down">
                                 { 
                                     this.state.expanded == 'expanded' && 

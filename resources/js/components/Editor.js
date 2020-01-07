@@ -968,7 +968,7 @@ class Editor extends React.Component {
                                     <i className="fa fa-plus"></i>
                                 </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="Browse notes" onClick={() => this.changeView('browse')}>
-                                    <i className="fa fa-list"></i>
+                                    <i className="fa fa-search"></i>
                                 </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="Go to previous page" onClick={() => this.previousPage()}>
                                     <i className="fa fa-arrow-left"></i>
@@ -1105,7 +1105,7 @@ class Editor extends React.Component {
                                     <i className="fa fa-plus"></i>
                                 </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="Browse notes" onClick={() => this.changeView('browse')}>
-                                    <i className="fa fa-list"></i>
+                                    <i className="fa fa-search"></i>
                                 </button>
                                 <button className="btn btn-default btn-md btn-toolbar" title="Delete this note" onClick={() => this.deleteNote()}>
                                     <i className="fa fa-trash"></i>

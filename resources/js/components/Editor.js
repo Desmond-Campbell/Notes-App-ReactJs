@@ -497,7 +497,19 @@ class Editor extends React.Component {
         const updated = this.state.updated;
         const lastsaved = this.state.lastsaved;
         
-        if ( !updated /*&& !options.force*/ ) return;
+        if ( !updated /*&& !options.force*/ ) {
+
+            if ( options.new ) {
+                this.addNote();
+            }
+
+            if ( options.browse ) {
+                this.changeView('browse');
+            }
+
+            return;
+
+        }
         
         var currenttime = Math.floor(Date.now() / 1000);
         var diff = currenttime - lastsaved;

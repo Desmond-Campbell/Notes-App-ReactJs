@@ -87880,6 +87880,8 @@ function (_React$Component) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-reply"
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "form-group"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("strong", null, "Type a new folder name:"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "push-down form-group"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "input-group mb-3"
@@ -88083,13 +88085,21 @@ function (_React$Component2) {
                 lastsaved = this.state.lastsaved;
 
                 if (updated) {
-                  _context3.next = 5;
+                  _context3.next = 7;
                   break;
+                }
+
+                if (options["new"]) {
+                  this.addNote();
+                }
+
+                if (options.browse) {
+                  this.changeView('browse');
                 }
 
                 return _context3.abrupt("return");
 
-              case 5:
+              case 7:
                 currenttime = Math.floor(Date.now() / 1000);
                 diff = currenttime - lastsaved;
 
@@ -88138,7 +88148,7 @@ function (_React$Component2) {
                 } else {// setTimeout(() => this.updateNote(), 30 - diff);
                 }
 
-              case 8:
+              case 10:
               case "end":
                 return _context3.stop();
             }

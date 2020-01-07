@@ -440,6 +440,14 @@ class Editor extends React.Component {
         this.setState({...this.state, expanded: new_expanded_state});
 
     }
+
+    collapseLayout() {
+
+        var new_expanded_state = 'collapsed';
+
+        this.setState({...this.state, expanded: new_expanded_state});
+
+    }
   
     handleChange (html) {
         
@@ -469,7 +477,8 @@ class Editor extends React.Component {
         var defaultMode = 'editor';
 
         if ( isMobile() ) {
-            this.toggleLayout();
+            this.switchToolbarMode();
+            this.collapseLayout();
         }
 
         if ( note_id ) {

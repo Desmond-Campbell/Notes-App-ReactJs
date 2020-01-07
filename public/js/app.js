@@ -88356,7 +88356,7 @@ function (_React$Component2) {
       var query = this.state.browse.query;
 
       var new_query = _objectSpread({}, query, {
-        currentPage: Math.max(0, query.currentPage + delta)
+        currentPage: Math.min(Math.max(0, query.currentPage + delta), query.pageCount)
       });
 
       this.setState(_objectSpread({}, this.state, {

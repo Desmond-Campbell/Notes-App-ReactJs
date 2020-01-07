@@ -680,7 +680,7 @@ class Editor extends React.Component {
     browsePage (delta) {
 
         const query = this.state.browse.query;
-        var new_query = {...query, currentPage: Math.max(0, query.currentPage + delta)};
+        var new_query = {...query, currentPage: Math.min( Math.max(0, query.currentPage + delta), query.pageCount )};
         this.setState({...this.state, browse: {...this.state.browse, query: new_query}});
         this.getNotes( new_query );
 

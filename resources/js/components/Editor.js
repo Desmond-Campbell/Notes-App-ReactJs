@@ -476,11 +476,6 @@ class Editor extends React.Component {
         
         var defaultMode = 'editor';
 
-        if ( isMobile() ) {
-            this.switchToolbarMode();
-            this.collapseLayout();
-        }
-
         if ( note_id ) {
             defaultMode = 'read';
         }
@@ -499,7 +494,12 @@ class Editor extends React.Component {
             this.loader(0);
             const result = response.data;
             var editMode = result.title != '' && result.title != 'Untitled Note' ? 'viewing' : 'editing';
-            this.setState({...this.state, note_id: result._id, editTitleMode: editMode, currentView: 'note', currentSubView: defaultMode, note: {...this.state.note, editorHtml: result.stack[0], ...result}});
+            this.setState({...this.state, note_id: result._id, editTitleMode: editMode, currentView: 'note', currentSubView: defaultMode, note: {...this.state.note, editorHtml: result.stack[0], ...result}}, function () {
+                    if ( isMobile() ) {
+                        this.switchToolbarMode();
+                        this.collapseLayout();
+                    }
+            });
         });
 
     }

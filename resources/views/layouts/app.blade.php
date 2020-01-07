@@ -29,7 +29,7 @@
             ...
         </div>
 
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" id="top-nav">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm" id="top-nav">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}

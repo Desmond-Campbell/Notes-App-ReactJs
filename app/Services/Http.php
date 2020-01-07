@@ -45,7 +45,7 @@ class Http extends Model
     	$response = $client->request( $verb, $url, $args );
     	$result = (string) $response->getBody();
 
-        file_put_contents("/var/www/notes/public/result.html", $result);
+        // file_put_contents("/var/www/notes/public/result.html", $result);
 
     	if ( json_decode( $result ) ?? null ) {
 

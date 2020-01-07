@@ -10,7 +10,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}?{{ env('ASSET_CACHE_ID', rand(1000000000, 9999999999)) }}" defer></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="/vendor/bootstrap/4.4.1/css/bootstrap.min.css" />
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}?{{ env('ASSET_CACHE_ID', rand(1000000000, 9999999999)) }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">

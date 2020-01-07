@@ -17,6 +17,8 @@
 
 .page-toolbar {
   padding: 5px;
+  padding-left: 0px;
+  padding-right: 0px;
   margin-bottom: 5px;
 }
 
@@ -28,8 +30,8 @@
   -webkit-box-shadow: none !important;
   -moz-box-shadow: none !important;
   border: none;
-  margin-left: 2px;
-  margin-right: 2px;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 .btn-toolbar:hover {

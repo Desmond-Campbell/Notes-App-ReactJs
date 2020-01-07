@@ -95,14 +95,14 @@ class AppController extends Controller
         $service_name = $this->service_name;
         $uri = '/notes/get-folders';
         
-        $folders = $this->http->post( $service_name, $uri, $payload )->folders ?? [];
+        $folders = $this->http->post( $service_name, $uri, $payload );
 
-        foreach ( $folders as $folder ) {
+        foreach ( $folders->folders as $folder ) {
             $folder->label = $folder->name;
             $folder->value = $folder->_id;
         }
 
-        return response()->json( [ 'notes' => $notes, 'folders' => $folders ] );
+        return response()->json( [ 'notes' => $notes, 'folders' => $folders->folders ?? [], 'total_counter' => $folders->total_counter ?? '∞' ] );
 
     }
 

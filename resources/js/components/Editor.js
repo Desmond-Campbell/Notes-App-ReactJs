@@ -85,7 +85,8 @@ class SideBar extends React.Component {
                         currentFolder: { _id: null, name: 'All Notes' },
                         currentSidebarView: 'notes',
                         new_folder: '',
-                        createFolderMode: 'create'
+                        createFolderMode: 'create',
+                        total_counter: '∞'
                     };
         this.search = this.search.bind(this);
         timer1 = setInterval( () => { this.getNotes(null); }, 30000 );
@@ -156,7 +157,16 @@ class SideBar extends React.Component {
             this.loader(0);
             const notes = response.data.notes;
             const folders = response.data.folders;
-            this.setState({...this.state, notes: notes, folders: folders});
+
+            var new_state = {...this.state, notes: notes, folders: folders};
+
+            if ( typeof response.data.total_counter !== 'undefined' ) {
+                new_state.total_counter = response.data.total_counter;   
+            }
+
+            this.setState(new_state, function() {
+
+            });
         });
 
     }
@@ -179,7 +189,12 @@ class SideBar extends React.Component {
             if ( typeof response.data.folders !== 'undefined' ) {
                 folders = response.data.folders.folders;
             }
-            this.setState({...this.state, new_folder: '', createFolderMode: 'create', folders: folders}, function(){
+            var new_state = {...this.state, new_folder: '', createFolderMode: 'create', folders: folders};
+
+            if ( typeof response.data.total_counter !== 'undefined' ) {
+                new_state.total_counter = response.data.total_counter;   
+            }
+            this.setState(new_state, function(){
                 this.changeSidebarView('notes');
             });
             jQuery('new_folder').val('');
@@ -211,7 +226,14 @@ class SideBar extends React.Component {
             if ( typeof response.data.folders !== 'undefined' ) {
                 folders = response.data.folders.folders;
             }
-            this.setState({...this.state, new_folder: '', folders: folders, currentFolder: {_id: null, name: 'All Notes'}}, function() {
+
+            var new_state = {...this.state, new_folder: '', folders: folders, currentFolder: {_id: null, name: 'All Notes'}};
+
+            if ( typeof response.data.total_counter !== 'undefined' ) {
+                new_state.total_counter = response.data.total_counter;   
+            }
+
+            this.setState(new_state, function() {
                 this.getNotes(null);
                 this.changeSidebarView('notes');
             });
@@ -313,7 +335,7 @@ class SideBar extends React.Component {
 
                         <li onClick={() => this.filterByFolderSidebar({_id: null, name: 'All Notes'})}>
                             <label className="list-item-title">All Notes</label>
-                            <label className="list-item-subtitle">0</label>
+                            <label className="list-item-subtitle">{this.state.total_counter}</label>
                         </li>
 
                         {this.state.folders.map( item => {
@@ -711,7 +733,14 @@ class Editor extends React.Component {
             const notes = response.data.notes.notes;
             const folders = response.data.folders.folders;
             const query = response.data.query;
-            this.setState({...this.state, notes: notes, folders: folders, browse: {...this.state.browse, query: query}});
+
+            var new_state = {...this.state, notes: notes, folders: folders, browse: {...this.state.browse, query: query}};
+
+            if ( typeof response.data.total_counter !== 'undefined' ) {
+                new_state.total_counter = response.data.total_counter;   
+            }
+
+            this.setState(new_state, function() {});
         });
 
     }
@@ -1099,9 +1128,9 @@ class Editor extends React.Component {
                         </div> }
 
                         { this.state.currentSubView == 'read' &&
-                        <div className="row read-container">
+                        <div className="row">
 
-                            <div className="col-md-12">
+                            <div className="col-md-12 read-container">
 
                                 {this.state.note.stack.map( item => {
                                     return (

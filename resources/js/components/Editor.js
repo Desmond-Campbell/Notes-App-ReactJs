@@ -161,21 +161,28 @@ class SideBar extends React.Component {
 
     }
 
-    async createFolder ( name ) {
+    async createFolder ( name, element, mode ) {
 
         this.loader(1);
         
         var payload = { name: name };
 
         if ( this.state.createFolderMode == 'edit' ) {
-            payload.folder_id = this.state.currentFolder.id;
+            payload._id = this.state.currentFolder._id;
+            payload.mode = 'edit';
         }
 
         axios.post('/api/notes/create-folder', payload)
           .then(response => {
             this.loader(0);
-            const folders = response.data.folders;
-            this.setState({...this.state, new_folder: '', folders: folders});
+            var folders = this.state.folders;
+            if ( typeof response.data.folders !== 'undefined' ) {
+                folders = response.data.folders.folders;
+            }
+            this.setState({...this.state, new_folder: '', createFolderMode: 'create', folders: folders}, function(){
+                this.changeSidebarView('notes');
+            });
+            jQuery('new_folder').val('');
         });
 
     }
@@ -185,8 +192,31 @@ class SideBar extends React.Component {
     }
 
     editFolder() {
-        this.setState({...this.state, createFolderMode: 'edit'});
-        this.changeSidebarView('create-folder');
+        this.setState({...this.state, createFolderMode: 'edit'},
+            function() {
+                this.changeSidebarView('create-folder');
+        });
+    }
+
+    deleteFolder() {
+
+        if ( !confirm('Delete this folder? The notes will be transferred to your default folder.') ) return;
+
+        var payload = { _id: this.state.currentFolder._id };
+
+        axios.post('/api/notes/delete-folder', payload)
+          .then(response => {
+            this.loader(0);
+            var folders = this.state.folders;
+            if ( typeof response.data.folders !== 'undefined' ) {
+                folders = response.data.folders.folders;
+            }
+            this.setState({...this.state, new_folder: '', folders: folders, currentFolder: {_id: null, name: 'All Notes'}}, function() {
+                this.getNotes(null);
+                this.changeSidebarView('notes');
+            });
+        });
+
     }
 
     toggleLayout () {
@@ -230,12 +260,16 @@ class SideBar extends React.Component {
                     <div className="push-down">
                         <label className="clickable">
                             <big>
-                                <a href="#!" onClick={() => this.changeSidebarView('folders')}>
+                                <a href="#!" onClick={() => this.changeSidebarView('folders')} style={{color: '#131313'}}>
                                     <strong>{this.state.currentFolder.name}</strong>
                                 </a>
                             </big> &nbsp; 
-                            <a href="#!" onClick={() => this.getNotes({})}><i className="fas fa-sync-alt"></i></a> &nbsp; 
-                            <a href="#!" onClick={() => this.editFolder()}><i className="fas fa-edit"></i></a>
+                            <a href="#!" onClick={() => this.getNotes({})}><i className="fas fa-sync-alt"></i></a>  &nbsp; 
+                            { this.state.currentFolder._id && 
+                            <span>
+                                <a href="#!" onClick={() => this.editFolder()} style={{color: '#333231'}}><i className="fas fa-edit"></i></a>  &nbsp; 
+                                <a href="#!" onClick={() => this.deleteFolder()} style={{color: '#700c0c'}}><i className="fa fa-trash"></i></a> &nbsp;  
+                            </span> }
                         </label>
                     </div>
 
@@ -302,17 +336,22 @@ class SideBar extends React.Component {
                         <i className="fa fa-reply"></i>
                     </button>
 
+                    <div className="form-group">
+                        <label><strong>Type a new folder name:</strong></label>
+                    </div>
+
                     <div className="push-down form-group">
                         <div className="input-group mb-3">
                             <input type="text" 
                                 className="form-control" 
-                                value={this.state.new_folder} 
+                                defaultValue={this.state.new_folder} 
                                 onKeyDown={e => this.handleCreateFolder(e)}
                                 onChange={e => { this.state.new_folder = e.target.value }}
                                 aria-label="" 
                                 aria-describedby="btn-grp-2"
                                 autoComplete="off"
                             />
+
                             <div className="input-group-append">
                                 <span className="input-group-text" id="btn-grp-2" onClick={() => this.createFolder(this.state.new_folder)}>
                                     <i className="fa fa-check"></i>

@@ -22,3 +22,4 @@ Route::post('/api/notes/update', 'AppController@store');
 Route::get('/api/notes/{id}/get', 'AppController@get');
 Route::post('/api/notes/{id}/delete', 'AppController@delete');
 Route::post('/api/notes/create-folder', 'AppController@createFolder');
+Route::post('/api/notes/delete-folder', 'AppController@deleteFolder');

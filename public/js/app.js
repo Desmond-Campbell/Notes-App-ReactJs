@@ -87615,7 +87615,7 @@ function (_React$Component) {
     value: function () {
       var _createFolder = _asyncToGenerator(
       /*#__PURE__*/
-      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(name) {
+      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(name, element, mode) {
         var _this3 = this;
 
         var payload;
@@ -87629,18 +87629,28 @@ function (_React$Component) {
                 };
 
                 if (this.state.createFolderMode == 'edit') {
-                  payload.folder_id = this.state.currentFolder.id;
+                  payload._id = this.state.currentFolder._id;
+                  payload.mode = 'edit';
                 }
 
                 axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/create-folder', payload).then(function (response) {
                   _this3.loader(0);
 
-                  var folders = response.data.folders;
+                  var folders = _this3.state.folders;
+
+                  if (typeof response.data.folders !== 'undefined') {
+                    folders = response.data.folders.folders;
+                  }
 
                   _this3.setState(_objectSpread({}, _this3.state, {
                     new_folder: '',
+                    createFolderMode: 'create',
                     folders: folders
-                  }));
+                  }), function () {
+                    this.changeSidebarView('notes');
+                  });
+
+                  jQuery('new_folder').val('');
                 });
 
               case 4:
@@ -87651,7 +87661,7 @@ function (_React$Component) {
         }, _callee2, this);
       }));
 
-      function createFolder(_x2) {
+      function createFolder(_x2, _x3, _x4) {
         return _createFolder.apply(this, arguments);
       }
 
@@ -87667,8 +87677,40 @@ function (_React$Component) {
     value: function editFolder() {
       this.setState(_objectSpread({}, this.state, {
         createFolderMode: 'edit'
-      }));
-      this.changeSidebarView('create-folder');
+      }), function () {
+        this.changeSidebarView('create-folder');
+      });
+    }
+  }, {
+    key: "deleteFolder",
+    value: function deleteFolder() {
+      var _this4 = this;
+
+      if (!confirm('Delete this folder? The notes will be transferred to your default folder.')) return;
+      var payload = {
+        _id: this.state.currentFolder._id
+      };
+      axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/delete-folder', payload).then(function (response) {
+        _this4.loader(0);
+
+        var folders = _this4.state.folders;
+
+        if (typeof response.data.folders !== 'undefined') {
+          folders = response.data.folders.folders;
+        }
+
+        _this4.setState(_objectSpread({}, _this4.state, {
+          new_folder: '',
+          folders: folders,
+          currentFolder: {
+            _id: null,
+            name: 'All Notes'
+          }
+        }), function () {
+          this.getNotes(null);
+          this.changeSidebarView('notes');
+        });
+      });
     }
   }, {
     key: "toggleLayout",
@@ -87701,7 +87743,7 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         id: "sidebar"
@@ -87713,7 +87755,7 @@ function (_React$Component) {
         className: "input-group-text",
         id: "btn-grp-1",
         onClick: function onClick() {
-          return _this4.toggleLayout();
+          return _this5.toggleLayout();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-times"
@@ -87722,7 +87764,7 @@ function (_React$Component) {
         className: "form-control",
         defaultValue: this.state.query.keywords,
         onKeyDown: function onKeyDown(e) {
-          return _this4.search(e);
+          return _this5.search(e);
         },
         "aria-label": "",
         "aria-describedby": "btn-grp-1",
@@ -87734,23 +87776,39 @@ function (_React$Component) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("big", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
         href: "#!",
         onClick: function onClick() {
-          return _this4.changeSidebarView('folders');
+          return _this5.changeSidebarView('folders');
+        },
+        style: {
+          color: '#131313'
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("strong", null, this.state.currentFolder.name))), " \xA0", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
         href: "#!",
         onClick: function onClick() {
-          return _this4.getNotes({});
+          return _this5.getNotes({});
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-sync-alt"
-      })), " \xA0", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+      })), "  \xA0", this.state.currentFolder._id && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
         href: "#!",
         onClick: function onClick() {
-          return _this4.editFolder();
+          return _this5.editFolder();
+        },
+        style: {
+          color: '#333231'
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-edit"
-      })))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      })), "  \xA0", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: function onClick() {
+          return _this5.deleteFolder();
+        },
+        style: {
+          color: '#700c0c'
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+        className: "fa fa-trash"
+      })), " \xA0"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "push-down"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("ul", {
         className: "sidebar-list"
@@ -87758,7 +87816,7 @@ function (_React$Component) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
           key: item._id,
           onClick: function onClick() {
-            return _this4.editNote(item._id);
+            return _this5.editNote(item._id);
           }
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
           className: "list-item-title"
@@ -87771,7 +87829,7 @@ function (_React$Component) {
         className: "btn btn-primary btn-md",
         title: "Back to notes",
         onClick: function onClick() {
-          return _this4.changeSidebarView('notes');
+          return _this5.changeSidebarView('notes');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-reply"
@@ -87783,7 +87841,7 @@ function (_React$Component) {
         href: "#!",
         title: "Create a Folder",
         onClick: function onClick() {
-          return _this4.changeSidebarView('create-folder');
+          return _this5.changeSidebarView('create-folder');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-plus-circle"
@@ -87791,7 +87849,7 @@ function (_React$Component) {
         className: "sidebar-list push-down"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
         onClick: function onClick() {
-          return _this4.filterByFolderSidebar({
+          return _this5.filterByFolderSidebar({
             _id: null,
             name: 'All Notes'
           });
@@ -87804,7 +87862,7 @@ function (_React$Component) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
           key: item._id,
           onClick: function onClick() {
-            return _this4.filterByFolderSidebar(item);
+            return _this5.filterByFolderSidebar(item);
           }
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
           className: "list-item-title"
@@ -87817,7 +87875,7 @@ function (_React$Component) {
         className: "btn btn-primary btn-md",
         title: "Back to notes",
         onClick: function onClick() {
-          return _this4.changeSidebarView('folders');
+          return _this5.changeSidebarView('folders');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-reply"
@@ -87828,12 +87886,12 @@ function (_React$Component) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "text",
         className: "form-control",
-        value: this.state.new_folder,
+        defaultValue: this.state.new_folder,
         onKeyDown: function onKeyDown(e) {
-          return _this4.handleCreateFolder(e);
+          return _this5.handleCreateFolder(e);
         },
         onChange: function onChange(e) {
-          _this4.state.new_folder = e.target.value;
+          _this5.state.new_folder = e.target.value;
         },
         "aria-label": "",
         "aria-describedby": "btn-grp-2",
@@ -87844,7 +87902,7 @@ function (_React$Component) {
         className: "input-group-text",
         id: "btn-grp-2",
         onClick: function onClick() {
-          return _this4.createFolder(_this4.state.new_folder);
+          return _this5.createFolder(_this5.state.new_folder);
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-check"
@@ -87861,12 +87919,12 @@ function (_React$Component2) {
   _inherits(Editor, _React$Component2);
 
   function Editor(props) {
-    var _this5;
+    var _this6;
 
     _classCallCheck(this, Editor);
 
-    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(Editor).call(this, props));
-    _this5.state = {
+    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(Editor).call(this, props));
+    _this6.state = {
       note: {
         _id: null,
         folder_id: null,
@@ -87895,8 +87953,8 @@ function (_React$Component2) {
       expanded: 'expanded',
       screenMode: 'normal'
     };
-    _this5.handleChange = _this5.handleChange.bind(_assertThisInitialized(_this5));
-    return _this5;
+    _this6.handleChange = _this6.handleChange.bind(_assertThisInitialized(_this6));
+    return _this6;
   }
 
   _createClass(Editor, [{
@@ -87918,7 +87976,7 @@ function (_React$Component2) {
   }, {
     key: "componentDidMount",
     value: function componentDidMount() {
-      var _this6 = this;
+      var _this7 = this;
 
       this.editNote(null);
       this.getNotes({});
@@ -87928,7 +87986,7 @@ function (_React$Component2) {
       }
 
       timer = setInterval(function () {
-        _this6.updateNote({
+        _this7.updateNote({
           force: true
         });
       }, 10000);
@@ -87971,7 +88029,7 @@ function (_React$Component2) {
   }, {
     key: "editNote",
     value: function editNote(note_id) {
-      var _this7 = this;
+      var _this8 = this;
 
       var defaultMode = 'editor';
 
@@ -87991,17 +88049,17 @@ function (_React$Component2) {
       }));
       this.loader(1);
       axios__WEBPACK_IMPORTED_MODULE_3___default.a.get('/api/notes/' + "".concat(note_id, "/get")).then(function (response) {
-        _this7.loader(0);
+        _this8.loader(0);
 
         var result = response.data;
         var editMode = result.title != '' && result.title != 'Untitled Note' ? 'viewing' : 'editing';
 
-        _this7.setState(_objectSpread({}, _this7.state, {
+        _this8.setState(_objectSpread({}, _this8.state, {
           note_id: result._id,
           editTitleMode: editMode,
           currentView: 'note',
           currentSubView: defaultMode,
-          note: _objectSpread({}, _this7.state.note, {
+          note: _objectSpread({}, _this8.state.note, {
             editorHtml: result.stack[0]
           }, result)
         }));
@@ -88013,7 +88071,7 @@ function (_React$Component2) {
       var _updateNote = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(options) {
-        var _this8 = this;
+        var _this9 = this;
 
         var note, updated, lastsaved, currenttime, diff;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
@@ -88042,16 +88100,16 @@ function (_React$Component2) {
                       note_id: this.state.note_id
                     }
                   }).then(function (response) {
-                    _this8.loader(0);
+                    _this9.loader(0);
 
-                    _this8.setState(_objectSpread({}, _this8.state, {
+                    _this9.setState(_objectSpread({}, _this9.state, {
                       updated: false,
                       saved: true,
                       lastsaved: currenttime
                     }));
 
                     setTimeout(function () {
-                      return _this8.setState(_objectSpread({}, _this8.state, {
+                      return _this9.setState(_objectSpread({}, _this9.state, {
                         saved: false
                       }));
                     }, 10000);
@@ -88060,9 +88118,9 @@ function (_React$Component2) {
                       var post_action = response.data.post_action;
 
                       if (post_action == 'getNotes') {
-                        _this8.getNotes({});
+                        _this9.getNotes({});
 
-                        _this8.setState(_objectSpread({}, _this8.state, {
+                        _this9.setState(_objectSpread({}, _this9.state, {
                           note: response.data.note,
                           note_id: response.data.note._id
                         }));
@@ -88070,11 +88128,11 @@ function (_React$Component2) {
                     }
 
                     if (options.browse) {
-                      _this8.changeView('browse');
+                      _this9.changeView('browse');
                     }
 
                     if (options["new"]) {
-                      _this8.addNote();
+                      _this9.addNote();
                     }
                   });
                 } else {// setTimeout(() => this.updateNote(), 30 - diff);
@@ -88088,7 +88146,7 @@ function (_React$Component2) {
         }, _callee3, this);
       }));
 
-      function updateNote(_x3) {
+      function updateNote(_x5) {
         return _updateNote.apply(this, arguments);
       }
 
@@ -88100,7 +88158,7 @@ function (_React$Component2) {
       var _deleteNote = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(id) {
-        var _this9 = this;
+        var _this10 = this;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
@@ -88116,12 +88174,12 @@ function (_React$Component2) {
               case 2:
                 this.loader(1);
                 axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/api/notes/' + "".concat(this.state.note_id, "/delete"), {}).then(function (response) {
-                  _this9.loader(0);
+                  _this10.loader(0);
 
                   if (typeof response.data.errors !== 'undefined') {
                     alert(response.data.errors);
                   } else {
-                    _this9.addNote();
+                    _this10.addNote();
                   }
                 });
 
@@ -88133,7 +88191,7 @@ function (_React$Component2) {
         }, _callee4, this);
       }));
 
-      function deleteNote(_x4) {
+      function deleteNote(_x6) {
         return _deleteNote.apply(this, arguments);
       }
 
@@ -88304,7 +88362,7 @@ function (_React$Component2) {
       var _getNotes2 = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(query) {
-        var _this10 = this;
+        var _this11 = this;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
@@ -88320,16 +88378,16 @@ function (_React$Component2) {
                     tested: true
                   }
                 }).then(function (response) {
-                  _this10.loader(0);
+                  _this11.loader(0);
 
                   var notes = response.data.notes.notes;
                   var folders = response.data.folders.folders;
                   var query = response.data.query;
 
-                  _this10.setState(_objectSpread({}, _this10.state, {
+                  _this11.setState(_objectSpread({}, _this11.state, {
                     notes: notes,
                     folders: folders,
-                    browse: _objectSpread({}, _this10.state.browse, {
+                    browse: _objectSpread({}, _this11.state.browse, {
                       query: query
                     })
                   }));
@@ -88343,7 +88401,7 @@ function (_React$Component2) {
         }, _callee5, this);
       }));
 
-      function getNotes(_x5) {
+      function getNotes(_x7) {
         return _getNotes2.apply(this, arguments);
       }
 
@@ -88437,7 +88495,7 @@ function (_React$Component2) {
   }, {
     key: "render",
     value: function render() {
-      var _this11 = this;
+      var _this12 = this;
 
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, this.state.currentView == 'browse' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row"
@@ -88450,7 +88508,7 @@ function (_React$Component2) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
           key: item._id,
           onClick: function onClick() {
-            return _this11.filterByFolder(item._id);
+            return _this12.filterByFolder(item._id);
           }
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
           className: "list-item-title"
@@ -88464,7 +88522,7 @@ function (_React$Component2) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-md btn-default",
         onClick: function onClick() {
-          return _this11.updateNote({
+          return _this12.updateNote({
             force: true,
             "new": true
           });
@@ -88474,21 +88532,21 @@ function (_React$Component2) {
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-md btn-default",
         onClick: function onClick() {
-          return _this11.changeView('note');
+          return _this12.changeView('note');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-reply"
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-md btn-default",
         onClick: function onClick() {
-          return _this11.browsePage(-1);
+          return _this12.browsePage(-1);
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-chevron-left"
       })), "Showing ", this.state.browse.query.currentPage, " of ", this.state.browse.query.pageCount, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "btn btn-md btn-default",
         onClick: function onClick() {
-          return _this11.browsePage(1);
+          return _this12.browsePage(1);
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-chevron-right"
@@ -88504,7 +88562,7 @@ function (_React$Component2) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
         href: "#!",
         onClick: function onClick() {
-          return _this11.getNotes(null);
+          return _this12.getNotes(null);
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-sync-alt"
@@ -88513,7 +88571,7 @@ function (_React$Component2) {
         className: "form-control",
         defaultValue: this.state.browse.query.keyword,
         onKeyDown: function onKeyDown(e) {
-          return _this11.search(e);
+          return _this12.search(e);
         },
         autoComplete: "off",
         "aria-label": "",
@@ -88527,9 +88585,9 @@ function (_React$Component2) {
           key: item._id,
           className: "col-md-3 grid-node",
           onClick: function onClick() {
-            _this11.changeView('note');
+            _this12.changeView('note');
 
-            _this11.editNote(item._id);
+            _this12.editNote(item._id);
           }
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
           className: "grid-node-title"
@@ -88553,21 +88611,21 @@ function (_React$Component2) {
         title: "Search notes by keywords",
         className: "form-control",
         onChange: function onChange(e) {
-          return _this11.updateInput("title", e.target.value);
+          return _this12.updateInput("title", e.target.value);
         },
         value: this.state.note.title,
         onKeyDown: function onKeyDown(e) {
-          return _this11.saveTitle(e);
+          return _this12.saveTitle(e);
         },
         onBlur: function onBlur(e) {
-          return _this11.saveTitle(e);
+          return _this12.saveTitle(e);
         },
         id: "note_title",
         autoComplete: "off"
       })), this.state.editTitleMode == 'viewing' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h2", {
         className: "note-title clickable",
         onClick: function onClick() {
-          return _this11.editTitle();
+          return _this12.editTitle();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(SaveMessage, {
         visible: !this.state.saved
@@ -88577,7 +88635,7 @@ function (_React$Component2) {
         className: "btn btn-primary btn-md btn-toolbar",
         title: "Hide sidebar",
         onClick: function onClick() {
-          return _this11.toggleLayout();
+          return _this12.toggleLayout();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-chevron-left"
@@ -88585,7 +88643,7 @@ function (_React$Component2) {
         className: "btn btn-primary btn-md btn-toolbar",
         title: "Show sidebar",
         onClick: function onClick() {
-          return _this11.toggleLayout();
+          return _this12.toggleLayout();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-chevron-right"
@@ -88593,7 +88651,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "New note",
         onClick: function onClick() {
-          return _this11.updateNote({
+          return _this12.updateNote({
             force: true,
             "new": true
           });
@@ -88604,7 +88662,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Browse notes",
         onClick: function onClick() {
-          return _this11.changeView('browse');
+          return _this12.changeView('browse');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-list"
@@ -88612,7 +88670,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Go to previous page",
         onClick: function onClick() {
-          return _this11.previousPage();
+          return _this12.previousPage();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-arrow-left"
@@ -88620,7 +88678,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Go to next page",
         onClick: function onClick() {
-          return _this11.nextPage();
+          return _this12.nextPage();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-arrow-right"
@@ -88628,7 +88686,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Delete this page",
         onClick: function onClick() {
-          return _this11.deletePage();
+          return _this12.deletePage();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-times"
@@ -88636,7 +88694,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Save",
         onClick: function onClick() {
-          return _this11.updateNote({
+          return _this12.updateNote({
             force: true
           });
         }
@@ -88646,7 +88704,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Save and exit",
         onClick: function onClick() {
-          return _this11.updateNote({
+          return _this12.updateNote({
             force: true,
             browse: true
           });
@@ -88657,7 +88715,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Delete this note",
         onClick: function onClick() {
-          return _this11.deleteNote();
+          return _this12.deleteNote();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-trash"
@@ -88665,7 +88723,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Read mode",
         onClick: function onClick() {
-          return _this11.readNote();
+          return _this12.readNote();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fab fa-readme"
@@ -88673,7 +88731,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Simple view",
         onClick: function onClick() {
-          return _this11.simpleView();
+          return _this12.simpleView();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-expand"
@@ -88681,7 +88739,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Note properties",
         onClick: function onClick() {
-          return _this11.changeSubView('properties');
+          return _this12.changeSubView('properties');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-sliders-h"
@@ -88691,7 +88749,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "New note",
         onClick: function onClick() {
-          return _this11.updateNote({
+          return _this12.updateNote({
             force: true,
             "new": true
           });
@@ -88702,7 +88760,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Go to previous page",
         onClick: function onClick() {
-          return _this11.previousPage();
+          return _this12.previousPage();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-arrow-left"
@@ -88710,7 +88768,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Go to next page",
         onClick: function onClick() {
-          return _this11.nextPage();
+          return _this12.nextPage();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-arrow-right"
@@ -88718,7 +88776,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Save",
         onClick: function onClick() {
-          return _this11.updateNote({
+          return _this12.updateNote({
             force: true
           });
         }
@@ -88728,7 +88786,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Read mode",
         onClick: function onClick() {
-          return _this11.readNote();
+          return _this12.readNote();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fab fa-readme"
@@ -88736,7 +88794,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Normal view",
         onClick: function onClick() {
-          return _this11.normalView();
+          return _this12.normalView();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-compress-arrows-alt"
@@ -88758,7 +88816,7 @@ function (_React$Component2) {
         className: "btn btn-primary btn-md",
         title: "Back to editor",
         onClick: function onClick() {
-          return _this11.changeSubView('editor');
+          return _this12.changeSubView('editor');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-reply"
@@ -88769,11 +88827,11 @@ function (_React$Component2) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("strong", null, "Folder")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_select__WEBPACK_IMPORTED_MODULE_6__["default"], {
         className: "col-md-6",
         options: this.state.folders.filter(function (item) {
-          return !_this11.isNull(item._id);
+          return !_this12.isNull(item._id);
         }),
         defaultValue: this.state.note.folder,
         onChange: function onChange(e) {
-          return _this11.handleChangeFolder(e);
+          return _this12.handleChangeFolder(e);
         }
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "form-group"
@@ -88784,13 +88842,13 @@ function (_React$Component2) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
         onChange: function onChange(e) {
-          return _this11.checkBoxHandler('is_private');
+          return _this12.checkBoxHandler('is_private');
         },
         checked: this.state.note.is_private,
         value: "1"
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
         onClick: function onClick(e) {
-          return _this11.checkBoxHandler('is_private');
+          return _this12.checkBoxHandler('is_private');
         }
       }, "\xA0 This is a private note"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "form-group"
@@ -88798,9 +88856,9 @@ function (_React$Component2) {
         className: "btn btn-success btn-md",
         title: "Save Note",
         onClick: function onClick() {
-          _this11.updateNote({});
+          _this12.updateNote({});
 
-          _this11.changeSubView('editor');
+          _this12.changeSubView('editor');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-check"
@@ -88810,7 +88868,7 @@ function (_React$Component2) {
         className: "btn btn-primary btn-md btn-toolbar",
         title: "Hide sidebar",
         onClick: function onClick() {
-          return _this11.toggleLayout();
+          return _this12.toggleLayout();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-chevron-left"
@@ -88818,7 +88876,7 @@ function (_React$Component2) {
         className: "btn btn-primary btn-md btn-toolbar",
         title: "Show sidebar",
         onClick: function onClick() {
-          return _this11.toggleLayout();
+          return _this12.toggleLayout();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-chevron-right"
@@ -88826,7 +88884,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "New note",
         onClick: function onClick() {
-          return _this11.updateNote({
+          return _this12.updateNote({
             force: true,
             "new": true
           });
@@ -88837,7 +88895,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Browse notes",
         onClick: function onClick() {
-          return _this11.changeView('browse');
+          return _this12.changeView('browse');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-list"
@@ -88845,7 +88903,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Delete this note",
         onClick: function onClick() {
-          return _this11.deleteNote();
+          return _this12.deleteNote();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-trash"
@@ -88853,7 +88911,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Edit mode",
         onClick: function onClick() {
-          return _this11.backToEditMode();
+          return _this12.backToEditMode();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-edit"
@@ -88861,7 +88919,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Simple view",
         onClick: function onClick() {
-          return _this11.simpleView();
+          return _this12.simpleView();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-expand"
@@ -88869,7 +88927,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Normal view",
         onClick: function onClick() {
-          return _this11.normalView();
+          return _this12.normalView();
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fas fa-compress-arrows-alt"
@@ -88877,7 +88935,7 @@ function (_React$Component2) {
         className: "btn btn-default btn-md btn-toolbar",
         title: "Note properties",
         onClick: function onClick() {
-          return _this11.changeSubView('properties');
+          return _this12.changeSubView('properties');
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
         className: "fa fa-sliders-h"

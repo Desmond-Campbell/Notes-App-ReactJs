@@ -24,7 +24,10 @@ class Http extends Model
 
     	$headers = [];
 
-    	$url = env( 'HTTP_ENDPOINT_' . strtoupper( $service ) ) . $uri;
+        $url = env( 'HTTP_ENDPOINT_' . strtoupper( $service ) ) . $uri;
+
+    	$token = env( 'HTTP_API_TOKEN_' . strtoupper( $service ) );
+        $payload['api_token'] = $token;
 
     	$client = new Client( [ 'base_uri' => $url, 'http_errors' => false ] );
 

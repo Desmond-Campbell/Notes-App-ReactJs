@@ -189,7 +189,7 @@ class AppController extends Controller
         $name = $r->input('name');
 
         $data = [];
-        $data['_id'] = $r->folder_id;
+        $data['_id'] = $r->_id;
         $data['name'] = $r->input('name') ?? null;
 
         if ( $data['name'] == '' ) {
@@ -206,6 +206,22 @@ class AppController extends Controller
 
         $service_name = $this->service_name;
         $uri = '/notes/add-folder';
+        
+        $response = $this->http->post( $service_name, $uri, $payload );
+
+        return response()->json( $response );
+
+    }
+
+    public function deleteFolder(Request $r){
+        
+
+        $payload = [];
+        $payload['user_id'] = Auth::user()->id;
+        $payload['_id'] = $r->_id;
+
+        $service_name = $this->service_name;
+        $uri = '/notes/delete-folder';
         
         $response = $this->http->post( $service_name, $uri, $payload );
 

@@ -18,7 +18,7 @@
     <link href="/vendor/font-awesome/css/all.css">
     <script defer src="/vendor/font-awesome/js/all.js"></script>
     <link rel="stylesheet" href="/vendor/bootstrap/4.4.1/css/bootstrap.min.css" />
-    <link rel="icon" href="https://img.icons8.com/clouds/100/000000/note.png" />
+    <link rel="icon" href="https://img.icons8.com/color/48/000000/note.png" />
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}?{{ env('ASSET_CACHE_ID', rand(1000000000, 9999999999)) }}" rel="stylesheet">
